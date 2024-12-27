@@ -30,7 +30,7 @@ namespace ArgAction {
 
 // A structure that defines arguments.
 // Arguments can be either optional or positional arguments.
-// If either `short` or `long` is set, it becomes an optional argument. 
+// If either `short` or `long` is set, it becomes an optional argument.
 // Otherwise, it is a positional argument.
 type Arg = unbox struct {
     id: String,             // A unique ID that identifies the argument.
@@ -86,7 +86,7 @@ namespace Arg {
     takes_multiple_values = |arg| (
         arg.set_takes_value(true).set_multiple_values(true).set_action(ArgAction::append())
     );
-    
+
     // Sets `@default_value`.
     default_value: String -> Arg -> Arg;
     default_value = |str| set_default_value(some(str));
@@ -120,7 +120,7 @@ namespace Arg {
     _positional_to_string: Arg -> String;
     _positional_to_string = |arg| (
         let multi = if arg.@multiple_values { "..." } else { "" };
-        if arg.@required { 
+        if arg.@required {
             "<" + arg.@id + ">" + multi
         } else {
             "[" + arg.@id + "]" + multi
@@ -142,7 +142,7 @@ namespace Arg {
 impl Arg: ToString {
     to_string = |arg| (
         if arg.@short != 0_U8 {
-            arg._short_to_string    
+            arg._short_to_string
         };
         if arg.@long != "" {
             arg._long_to_string
@@ -366,13 +366,13 @@ namespace ArgParser
                 let (_, parser) = *parser.advance;
                 continue_m $ parser
             };
-            if input.substring(0, 1) == "-" {
+            if input.get_sub(0, 1) == "-" {
                 continue_m $ *parser._process_option_arg
             };
             continue_m $ *parser._process_positional_arg
         )
     );
-    
+
     // Treats the current input as an optional argument.
     _process_option_arg: ArgParser -> Result ErrMsg ArgParser;
     _process_option_arg = |parser| (
@@ -385,7 +385,7 @@ namespace ArgParser
         let arg = matched_args.get_first.as_some;
         let parser = *parser._perform_action(arg);
         let parser = if arg.@multiple_values || arg.@action.is_increment { parser } else { parser._remove_arg(arg) };
-        ok $ parser 
+        ok $ parser
     );
 
     // Treats the current input as a positional argument.
@@ -400,7 +400,7 @@ namespace ArgParser
         let parser = *parser._perform_action(arg);
         let parser = if arg.@multiple_values { parser } else { parser._remove_arg(arg) };
         ok $ parser
-    ); 
+    );
 
     // Remove `arg` from the remaining args.
     _remove_arg: Arg -> ArgParser -> ArgParser;
@@ -446,7 +446,7 @@ namespace ArgParser
         };
         ok $ parser
     );
-    
+
     // Set the value to `arg`.
     set_value: Arg -> String -> ArgParser -> ArgParser;
     set_value = |arg, value, parser| (
@@ -485,7 +485,7 @@ namespace ArgParser
     // Check whether the required argument values are set. Reports an error if the value is not set.
     check_required_args_present: ArgParser -> Result ErrMsg ArgParser;
     check_required_args_present = |parser| (
-        let missing_args: Iterator Arg = 
+        let missing_args: Iterator Arg =
             parser.@command.@args.to_iter
             .filter(|arg| arg.@required)
             .filter(|arg| !parser.@matches.@map.contains_key(arg.@id));
@@ -529,7 +529,7 @@ namespace ArgMatches {
     empty: ArgMatches;
     empty = ArgMatches {
         subcommand: none(),
-        map: HashMap::empty(0) 
+        map: HashMap::empty(0)
     };
 
     subcommand: ArgMatches -> Option (String, ArgMatches);
@@ -568,20 +568,20 @@ namespace ArgMatches {
 //  HelpTemplate
 // ---------------------------------
 
-type HelpTemplate = unbox struct { 
-    data: String 
+type HelpTemplate = unbox struct {
+    data: String
 };
 namespace HelpTemplate {
     new: String -> HelpTemplate;
     new = |str| HelpTemplate { data: str };
 
     _default_help: HelpTemplate;
-    _default_help = HelpTemplate { 
+    _default_help = HelpTemplate {
         data: (
             "{name-version}\n" +
             "{author-with-newline}" +
             "{about-with-newline}" +
-            "\n" + 
+            "\n" +
             "{usage}\n" +
             "{all-args}"
         )
@@ -597,18 +597,18 @@ namespace HelpTemplate {
     format: Command -> HelpTemplate -> String;
     format = |command, help_template| (
         let help = help_template.@data;
-        let help = help.replace_all("{name-version}", command.@display_name + 
+        let help = help.replace_all("{name-version}", command.@display_name +
             if command.@version == "" { "" } else { " " + command.@version });
-        let help = help.replace_all("{author-with-newline}", 
+        let help = help.replace_all("{author-with-newline}",
             if command.@author == "" { "" } else { command.@author + "\n" }
         );
-        let help = help.replace_all("{about-with-newline}", 
+        let help = help.replace_all("{about-with-newline}",
             if command.@about == "" { "" } else { command.@about + "\n" }
         );
-        let help = help.replace_all("{usage}", 
+        let help = help.replace_all("{usage}",
             help_template._format_usage(command)
         );
-        let help = help.replace_all("{all-args}", 
+        let help = help.replace_all("{all-args}",
             help_template._format_all_args(command)
         );
         help
