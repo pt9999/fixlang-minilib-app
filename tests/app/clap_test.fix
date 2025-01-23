@@ -58,7 +58,7 @@ test_help_empty = make_test("test_help_empty") $ |_| (
         "cmd\n" +
         "\n" +
         "USAGE:\n" +
-        "    cmd [OPTIONS]\n" + 
+        "    cmd [OPTIONS]\n" +
         "\n" +
         "OPTIONS:\n" +
         "    -h, --help                  Print help information\n" +
@@ -78,7 +78,7 @@ test_help_typical = make_test("test_help_typical") $ |_| (
         "somebody <somebody@example.com>\n" +
         "\n" +
         "USAGE:\n" +
-        "    typical [OPTIONS] <TARGET> [FILE]...\n" + 
+        "    typical [OPTIONS] <TARGET> [FILE]...\n" +
         "\n" +
         "ARGS:\n" +
         "    <TARGET>   Target\n" +
@@ -94,8 +94,8 @@ test_help_typical = make_test("test_help_typical") $ |_| (
     );
     let res = command.get_matches_from(["typical", "--help"]);
     let _ = *(assert_true("err", res.is_err));
-    //let _ = *write_file_string(Path::parse(",1").as_some, expected);
-    //let _ = *write_file_string(Path::parse(",2").as_some, res.as_err);
+    //let _ = *write_file_string(",1", expected);
+    //let _ = *write_file_string(",2", res.as_err);
     let _ = *(assert_equal("err", expected, res.as_err));
     pure()
 );
@@ -108,7 +108,7 @@ test_help_rich = make_test("test_help_rich") $ |_| (
         "somebody <somebody@example.com>\n" +
         "\n" +
         "USAGE:\n" +
-        "    rich [OPTIONS] [SUBCOMMAND]\n" + 
+        "    rich [OPTIONS] [SUBCOMMAND]\n" +
         "\n" +
         "OPTIONS:\n" +
         "    -h, --help                  Print help information\n" +
@@ -120,8 +120,8 @@ test_help_rich = make_test("test_help_rich") $ |_| (
     );
     let res = command.get_matches_from(["rich"]);
     let _ = *(assert_true("err", res.is_err));
-    //let _ = *write_file_string(Path::parse(",1").as_some, expected);
-    //let _ = *write_file_string(Path::parse(",2").as_some, res.as_err);
+    //let _ = *write_file_string(",1", expected);
+    //let _ = *write_file_string(",2", res.as_err);
     let _ = *(assert_equal("err", expected, res.as_err));
     pure()
 );
@@ -134,7 +134,7 @@ test_help_rich_run = make_test("test_help_rich_run") $ |_| (
         "Run a program\n" +
         "\n" +
         "USAGE:\n" +
-        "    rich run [OPTIONS] [FILE]...\n" + 
+        "    rich run [OPTIONS] [FILE]...\n" +
         "\n" +
         "ARGS:\n" +
         "    [FILE]...  Input files\n" +
@@ -146,8 +146,8 @@ test_help_rich_run = make_test("test_help_rich_run") $ |_| (
     );
     let res = command.get_matches_from(["rich", "run", "--help"]);
     let _ = *(assert_true("err", res.is_err));
-    //let _ = *write_file_string(Path::parse(",1").as_some, expected);
-    //let _ = *write_file_string(Path::parse(",2").as_some, res.as_err);
+    //let _ = *write_file_string(",1", expected);
+    //let _ = *write_file_string(",2", res.as_err);
     let _ = *(assert_equal("err", expected, res.as_err));
     pure()
 );
@@ -160,7 +160,7 @@ test_help_rich_build = make_test("test_help_rich_build") $ |_| (
         "Build an executable\n" +
         "\n" +
         "USAGE:\n" +
-        "    rich build [OPTIONS] [FILE]...\n" + 
+        "    rich build [OPTIONS] [FILE]...\n" +
         "\n" +
         "ARGS:\n" +
         "    [FILE]...  Input files\n" +
@@ -173,8 +173,8 @@ test_help_rich_build = make_test("test_help_rich_build") $ |_| (
     );
     let res = command.get_matches_from(["rich", "build", "--help"]);
     let _ = *(assert_true("err", res.is_err));
-    //let _ = *write_file_string(Path::parse(",1").as_some, expected);
-    //let _ = *write_file_string(Path::parse(",2").as_some, res.as_err);
+    //let _ = *write_file_string(",1", expected);
+    //let _ = *write_file_string(",2", res.as_err);
     let _ = *(assert_equal("err", expected, res.as_err));
     pure()
 );
