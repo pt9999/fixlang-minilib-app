@@ -186,19 +186,19 @@ Gets the value of the argument with the specified ID.
 
 ## `namespace Minilib.App.Clap::ArgParser`
 
-### `_increment_value : Minilib.App.Clap::Arg -> Minilib.App.Clap::ArgParser::ArgParser -> Std::Result Std::String Minilib.App.Clap::ArgParser::ArgParser`
+### `_increment_value : Minilib.App.Clap::Arg -> Minilib.App.Clap::ArgParser::ArgParser -> Std::Result Std::ErrMsg Minilib.App.Clap::ArgParser::ArgParser`
 
 Increments the value as an integer.
 
-### `_perform_action : Minilib.App.Clap::Arg -> Minilib.App.Clap::ArgParser::ArgParser -> Std::Result Std::String Minilib.App.Clap::ArgParser::ArgParser`
+### `_perform_action : Minilib.App.Clap::Arg -> Minilib.App.Clap::ArgParser::ArgParser -> Std::Result Std::ErrMsg Minilib.App.Clap::ArgParser::ArgParser`
 
 Performs the action set in `arg`.
 
-### `_process_option_arg : Minilib.App.Clap::ArgParser::ArgParser -> Std::Result Std::String Minilib.App.Clap::ArgParser::ArgParser`
+### `_process_option_arg : Minilib.App.Clap::ArgParser::ArgParser -> Std::Result Std::ErrMsg Minilib.App.Clap::ArgParser::ArgParser`
 
 Treats the current input as an optional argument.
 
-### `_process_positional_arg : Minilib.App.Clap::ArgParser::ArgParser -> Std::Result Std::String Minilib.App.Clap::ArgParser::ArgParser`
+### `_process_positional_arg : Minilib.App.Clap::ArgParser::ArgParser -> Std::Result Std::ErrMsg Minilib.App.Clap::ArgParser::ArgParser`
 
 Treats the current input as a positional argument.
 
@@ -206,11 +206,11 @@ Treats the current input as a positional argument.
 
 Remove `arg` from the remaining args.
 
-### `_set_or_append_value : Minilib.App.Clap::Arg -> Minilib.App.Clap::ArgParser::ArgParser -> Std::Result Std::String Minilib.App.Clap::ArgParser::ArgParser`
+### `_set_or_append_value : Minilib.App.Clap::Arg -> Minilib.App.Clap::ArgParser::ArgParser -> Std::Result Std::ErrMsg Minilib.App.Clap::ArgParser::ArgParser`
 
 Takes the current input as a value and performs a `set` or `append` action.
 
-### `advance : Minilib.App.Clap::ArgParser::ArgParser -> Std::Result Std::String (Std::String, Minilib.App.Clap::ArgParser::ArgParser)`
+### `advance : Minilib.App.Clap::ArgParser::ArgParser -> Std::Result Std::ErrMsg (Std::String, Minilib.App.Clap::ArgParser::ArgParser)`
 
 Proceed to next input.
 
@@ -218,11 +218,11 @@ Proceed to next input.
 
 Adds a value to the array of values in `arg`.
 
-### `check_required_args_present : Minilib.App.Clap::ArgParser::ArgParser -> Std::Result Std::String Minilib.App.Clap::ArgParser::ArgParser`
+### `check_required_args_present : Minilib.App.Clap::ArgParser::ArgParser -> Std::Result Std::ErrMsg Minilib.App.Clap::ArgParser::ArgParser`
 
 Check whether the required argument values are set. Reports an error if the value is not set.
 
-### `get_input : Minilib.App.Clap::ArgParser::ArgParser -> Std::Result Std::String Std::String`
+### `get_input : Minilib.App.Clap::ArgParser::ArgParser -> Std::Result Std::ErrMsg Std::String`
 
 Get the current input.
 
@@ -234,11 +234,11 @@ Creates an `ArgParser` based on the input array and command.
 
 Returns True if there are no more inputs. Returns False if there is more input.
 
-### `parse_args : Minilib.App.Clap::ArgParser::ArgParser -> Std::Result Std::String Minilib.App.Clap::ArgParser::ArgParser`
+### `parse_args : Minilib.App.Clap::ArgParser::ArgParser -> Std::Result Std::ErrMsg Minilib.App.Clap::ArgParser::ArgParser`
 
 Parse the actual command line argument array and set the value of `Arg`.
 
-### `set_default_if_not_present : Minilib.App.Clap::ArgParser::ArgParser -> Std::Result Std::String Minilib.App.Clap::ArgParser::ArgParser`
+### `set_default_if_not_present : Minilib.App.Clap::ArgParser::ArgParser -> Std::Result Std::ErrMsg Minilib.App.Clap::ArgParser::ArgParser`
 
 If no value is set for the argument, set the default value.
 
@@ -250,7 +250,7 @@ Set the value to `arg`.
 
 ### `_default_args : Std::Array Minilib.App.Clap::Arg`
 
-### `_get_submatches_from : Std::Array Std::String -> Minilib.App.Clap::Command -> Std::Result Std::String (Std::String, Minilib.App.Clap::ArgMatches)`
+### `_get_submatches_from : Std::Array Std::String -> Minilib.App.Clap::Command -> Std::Result Std::ErrMsg (Std::String, Minilib.App.Clap::ArgMatches)`
 
 ### `about : Std::String -> Minilib.App.Clap::Command -> Minilib.App.Clap::Command`
 
@@ -277,7 +277,7 @@ Sets the display name of the command.
 Parse command line arguments based on `IO::get_args`.
 If `--help` or `--version` is specified, the help string or version string will be returned as `throw`.
 
-### `get_matches_from : Std::Array Std::String -> Minilib.App.Clap::Command -> Std::Result Std::String Minilib.App.Clap::ArgMatches`
+### `get_matches_from : Std::Array Std::String -> Minilib.App.Clap::Command -> Std::Result Std::ErrMsg Minilib.App.Clap::ArgMatches`
 
 Parses command line arguments based on the specified input array.
 If `--help` or `--version` is specified, the help string or version string will be returned as the error message.
