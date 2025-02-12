@@ -283,7 +283,7 @@ namespace Command {
     _get_submatches_from: Array String -> Command -> Result ErrMsg (String, ArgMatches);
     _get_submatches_from = |inputs, command| (
         // drop first argument as it is the executable name
-        let inputs = inputs.to_iter.get_tail.map_or(Iterator::empty, |a|a).to_array;
+        let inputs = inputs.to_iter.get_tail.map_or([], to_array);
         if inputs.get_size == 0 {
             err $ command.render_help
         };
@@ -307,9 +307,9 @@ namespace ArgParser
 {
     type ArgParser = unbox struct {
         command: Command,
-        remaining_args: Iterator Arg,
+        remaining_args: DynIterator Arg,
         matches: ArgMatches,
-        inputs: Iterator String,
+        inputs: DynIterator String,
         positional_only: Bool
     };
 
@@ -317,10 +317,10 @@ namespace ArgParser
     make: Array String -> Command -> ArgParser;
     make = |inputs, command| (
         // drop first argument as it is the executable name (or subcommand name)
-        let inputs = inputs.to_iter.get_tail.map_or(Iterator::empty, |a|a);
+        let inputs = inputs.to_iter.get_tail.map_or(DynIterator::empty, to_dyn);
         ArgParser {
             command: command,
-            remaining_args: command.@args.to_iter,
+            remaining_args: command.@args.to_iter.to_dyn,
             matches: ArgMatches::empty,
             inputs: inputs,
             positional_only: false
@@ -338,7 +338,7 @@ namespace ArgParser
     advance = |parser| (
         parser.@inputs.advance.map_or(
             err $ "No inputs",
-            |(input, next)| ok $ (input, parser.set_inputs(next))
+            |(next, input)| ok $ (input, parser.set_inputs(next))
         )
     );
 
@@ -405,7 +405,7 @@ namespace ArgParser
     // Remove `arg` from the remaining args.
     _remove_arg: Arg -> ArgParser -> ArgParser;
     _remove_arg = |arg, parser| (
-        parser.mod_remaining_args(filter(|a| a.@id != arg.@id))
+        parser.mod_remaining_args(filter(|a| a.@id != arg.@id) >> to_dyn)
     );
 
     // Performs the action set in `arg`.
@@ -485,15 +485,15 @@ namespace ArgParser
     // Check whether the required argument values are set. Reports an error if the value is not set.
     check_required_args_present: ArgParser -> Result ErrMsg ArgParser;
     check_required_args_present = |parser| (
-        let missing_args: Iterator Arg =
+        let missing_args: DynIterator Arg =
             parser.@command.@args.to_iter
             .filter(|arg| arg.@required)
-            .filter(|arg| !parser.@matches.@map.contains_key(arg.@id));
+            .filter(|arg| !parser.@matches.@map.contains_key(arg.@id)).to_dyn;
         if missing_args.is_empty {
             ok $ parser
         };
         err $ "The following required arguments were not provided:\n" +
-        missing_args.map(|arg| "    " + arg.to_string + "\n")
+        missing_args.Functor::map(|arg| "    " + arg.to_string + "\n")
         .concat_iter
     );
 
@@ -502,7 +502,7 @@ namespace ArgParser
     set_default_if_not_present = |parser| (
         pure $ parser.@command.@args.to_iter.fold(
             parser,
-            |parser, arg|
+            |arg, parser|
             if arg.@default_value.is_none {
                 parser
             };
