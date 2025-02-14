@@ -98,11 +98,11 @@ The action taken when the argument is parsed.
 
 #### field `command : Minilib.App.Clap::Command`
 
-#### field `remaining_args : Std::Iterator Minilib.App.Clap::Arg`
+#### field `remaining_args : Std::Iterator::DynIterator Minilib.App.Clap::Arg`
 
 #### field `matches : Minilib.App.Clap::ArgMatches`
 
-#### field `inputs : Std::Iterator Std::String`
+#### field `inputs : Std::Iterator::DynIterator Std::String`
 
 #### field `positional_only : Std::Bool`
 
