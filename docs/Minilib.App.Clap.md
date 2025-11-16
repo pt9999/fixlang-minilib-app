@@ -1,6 +1,6 @@
 # Minilib.App.Clap
 
-Defined in minilib-app@0.5.1
+Defined in minilib-app@0.5.2
 
 Command line argument parser.
 Inspired by [`clap` crate of Rust](https://docs.rs/clap/3.2.0/clap/index.html).
@@ -8,30 +8,6 @@ Inspired by [`clap` crate of Rust](https://docs.rs/clap/3.2.0/clap/index.html).
 ## Values
 
 ### namespace Minilib.App.Clap::Arg
-
-#### _is_option
-
-Type: `Minilib.App.Clap::Arg -> Std::Bool`
-
-#### _is_positional
-
-Type: `Minilib.App.Clap::Arg -> Std::Bool`
-
-#### _long_to_string
-
-Type: `Minilib.App.Clap::Arg -> Std::String`
-
-#### _option_matches
-
-Type: `Std::String -> Minilib.App.Clap::Arg -> Std::Bool`
-
-#### _positional_to_string
-
-Type: `Minilib.App.Clap::Arg -> Std::String`
-
-#### _short_to_string
-
-Type: `Minilib.App.Clap::Arg -> Std::String`
 
 #### default_value
 
@@ -89,14 +65,6 @@ Sets `@value_name`.
 
 ### namespace Minilib.App.Clap::ArgMatches
 
-#### _mod_values
-
-Type: `Std::String -> (Std::Array Std::String -> Std::Array Std::String) -> Minilib.App.Clap::ArgMatches -> Minilib.App.Clap::ArgMatches`
-
-#### _set_values
-
-Type: `Std::String -> Std::Array Std::String -> Minilib.App.Clap::ArgMatches -> Minilib.App.Clap::ArgMatches`
-
 #### empty
 
 Type: `Minilib.App.Clap::ArgMatches`
@@ -120,42 +88,6 @@ Gets the value of the argument with the specified ID.
 Type: `Minilib.App.Clap::ArgMatches -> Std::Option (Std::String, Minilib.App.Clap::ArgMatches)`
 
 ### namespace Minilib.App.Clap::ArgParser
-
-#### _increment_value
-
-Type: `Minilib.App.Clap::Arg -> Minilib.App.Clap::ArgParser::ArgParser -> Std::Result Std::ErrMsg Minilib.App.Clap::ArgParser::ArgParser`
-
-Increments the value as an integer.
-
-#### _perform_action
-
-Type: `Minilib.App.Clap::Arg -> Minilib.App.Clap::ArgParser::ArgParser -> Std::Result Std::ErrMsg Minilib.App.Clap::ArgParser::ArgParser`
-
-Performs the action set in `arg`.
-
-#### _process_option_arg
-
-Type: `Minilib.App.Clap::ArgParser::ArgParser -> Std::Result Std::ErrMsg Minilib.App.Clap::ArgParser::ArgParser`
-
-Treats the current input as an optional argument.
-
-#### _process_positional_arg
-
-Type: `Minilib.App.Clap::ArgParser::ArgParser -> Std::Result Std::ErrMsg Minilib.App.Clap::ArgParser::ArgParser`
-
-Treats the current input as a positional argument.
-
-#### _remove_arg
-
-Type: `Minilib.App.Clap::Arg -> Minilib.App.Clap::ArgParser::ArgParser -> Minilib.App.Clap::ArgParser::ArgParser`
-
-Remove `arg` from the remaining args.
-
-#### _set_or_append_value
-
-Type: `Minilib.App.Clap::Arg -> Minilib.App.Clap::ArgParser::ArgParser -> Std::Result Std::ErrMsg Minilib.App.Clap::ArgParser::ArgParser`
-
-Takes the current input as a value and performs a `set` or `append` action.
 
 #### advance
 
@@ -212,14 +144,6 @@ Type: `Minilib.App.Clap::Arg -> Std::String -> Minilib.App.Clap::ArgParser::ArgP
 Set the value to `arg`.
 
 ### namespace Minilib.App.Clap::Command
-
-#### _default_args
-
-Type: `Std::Array Minilib.App.Clap::Arg`
-
-#### _get_submatches_from
-
-Type: `Std::Array Std::String -> Minilib.App.Clap::Command -> Std::Result Std::ErrMsg (Std::String, Minilib.App.Clap::ArgMatches)`
 
 #### about
 
@@ -302,34 +226,6 @@ Type: `Std::String -> Minilib.App.Clap::Command -> Minilib.App.Clap::Command`
 Sets the version of the command.
 
 ### namespace Minilib.App.Clap::HelpTemplate
-
-#### _default_help
-
-Type: `Minilib.App.Clap::HelpTemplate`
-
-#### _default_version
-
-Type: `Minilib.App.Clap::HelpTemplate`
-
-#### _format_all_args
-
-Type: `Minilib.App.Clap::Command -> Minilib.App.Clap::HelpTemplate -> Std::String`
-
-#### _format_arg
-
-Type: `Minilib.App.Clap::Arg -> Std::String`
-
-#### _format_option
-
-Type: `Minilib.App.Clap::Arg -> Std::String`
-
-#### _format_subcommand
-
-Type: `Minilib.App.Clap::Command -> Std::String`
-
-#### _format_usage
-
-Type: `Minilib.App.Clap::Command -> Minilib.App.Clap::HelpTemplate -> Std::String`
 
 #### format
 
