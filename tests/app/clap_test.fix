@@ -65,8 +65,8 @@ test_help_empty = make_test("test_help_empty") $ |_| (
         "    -V, --version               Print version information\n"
     );
     let res = command.get_matches_from(["cmd", "-h"]);
-    let _ = *(assert_true("err", res.is_err));
-    let _ = *(assert_equal("err", expected, res.as_err));
+    assert_true("err", res.is_err);;
+    assert_equal("err", expected, res.as_err);;
     pure()
 );
 
@@ -93,10 +93,10 @@ test_help_typical = make_test("test_help_typical") $ |_| (
         "        --verbose               Verbose mode\n"
     );
     let res = command.get_matches_from(["typical", "--help"]);
-    let _ = *(assert_true("err", res.is_err));
-    //let _ = *write_file_string(",1", expected);
-    //let _ = *write_file_string(",2", res.as_err);
-    let _ = *(assert_equal("err", expected, res.as_err));
+    assert_true("err", res.is_err);;
+    //write_file_string(",1", expected);;
+    //write_file_string(",2", res.as_err);;
+    assert_equal("err", expected, res.as_err);;
     pure()
 );
 
@@ -119,10 +119,10 @@ test_help_rich = make_test("test_help_rich") $ |_| (
         "    build      Build an executable\n"
     );
     let res = command.get_matches_from(["rich"]);
-    let _ = *(assert_true("err", res.is_err));
-    //let _ = *write_file_string(",1", expected);
-    //let _ = *write_file_string(",2", res.as_err);
-    let _ = *(assert_equal("err", expected, res.as_err));
+    assert_true("err", res.is_err);;
+    //write_file_string(",1", expected);;
+    //write_file_string(",2", res.as_err);;
+    assert_equal("err", expected, res.as_err);;
     pure()
 );
 
@@ -145,10 +145,10 @@ test_help_rich_run = make_test("test_help_rich_run") $ |_| (
         "    -v                          Increment verbose level\n"
     );
     let res = command.get_matches_from(["rich", "run", "--help"]);
-    let _ = *(assert_true("err", res.is_err));
-    //let _ = *write_file_string(",1", expected);
-    //let _ = *write_file_string(",2", res.as_err);
-    let _ = *(assert_equal("err", expected, res.as_err));
+    assert_true("err", res.is_err);;
+    //write_file_string(",1", expected);;
+    //write_file_string(",2", res.as_err);;
+    assert_equal("err", expected, res.as_err);;
     pure()
 );
 
@@ -172,10 +172,10 @@ test_help_rich_build = make_test("test_help_rich_build") $ |_| (
         "    -v                          Increment verbose level\n"
     );
     let res = command.get_matches_from(["rich", "build", "--help"]);
-    let _ = *(assert_true("err", res.is_err));
-    //let _ = *write_file_string(",1", expected);
-    //let _ = *write_file_string(",2", res.as_err);
-    let _ = *(assert_equal("err", expected, res.as_err));
+    assert_true("err", res.is_err);;
+    //write_file_string(",1", expected);;
+    //write_file_string(",2", res.as_err);;
+    assert_equal("err", expected, res.as_err);;
     pure()
 );
 
@@ -186,8 +186,8 @@ test_version_typical = make_test("test_version_typical") $ |_| (
         "TypicalTool 1.0.0\n"
     );
     let res = command.get_matches_from(["typical", "--version"]);
-    let _ = *(assert_true("err", res.is_err));
-    let _ = *(assert_equal("err", expected, res.as_err));
+    assert_true("err", res.is_err);;
+    assert_equal("err", expected, res.as_err);;
     pure()
 );
 
@@ -196,13 +196,13 @@ test_matches_typical = make_test("test_matches_typical") $ |_| (
     let command = typical_command;
     let inputs = "typical -n 3 --output out.txt mytarget in.txt -- -in2.txt".split(" ").to_array;
     let matches = *command.get_matches_from(inputs).from_result;
-    let _ = *(assert_equal("count", some("3"), matches.get_one("count")));
-    let _ = *(assert_equal("output", some("out.txt"), matches.get_one("output")));
-    let _ = *(assert_equal("TARGET", some("mytarget"), matches.get_one("TARGET")));
-    let _ = *(assert_equal("FILE", some(["in.txt", "-in2.txt"]), matches.get_many("FILE")));
-    let _ = *(assert_equal("force", none(), matches.get_one("force")));
-    let _ = *(assert_equal("verbose", none(), matches.get_one("verbose")));
-    let _ = *(assert_equal("no-such-arg", none(), matches.get_one("no-such-arg")));
+    assert_equal("count", some("3"), matches.get_one("count"));;
+    assert_equal("output", some("out.txt"), matches.get_one("output"));;
+    assert_equal("TARGET", some("mytarget"), matches.get_one("TARGET"));;
+    assert_equal("FILE", some(["in.txt", "-in2.txt"]), matches.get_many("FILE"));;
+    assert_equal("force", none(), matches.get_one("force"));;
+    assert_equal("verbose", none(), matches.get_one("verbose"));;
+    assert_equal("no-such-arg", none(), matches.get_one("no-such-arg"));;
     pure()
 );
 
@@ -211,13 +211,13 @@ test_matches_typical2 = make_test("test_matches_typical2") $ |_| (
     let command = typical_command;
     let inputs = "typical mytarget -f --verbose".split(" ").to_array;
     let matches = *command.get_matches_from(inputs).from_result;
-    let _ = *(assert_equal("count", some("100"), matches.get_one("count")));
-    let _ = *(assert_equal("output", none(), matches.get_one("output")));
-    let _ = *(assert_equal("TARGET", some("mytarget"), matches.get_one("TARGET")));
-    let _ = *(assert_equal("FILE", none(), matches.get_many("FILE")));
-    let _ = *(assert_equal("force", some("true"), matches.get_one("force")));
-    let _ = *(assert_equal("verbose", some("true"), matches.get_one("verbose")));
-    let _ = *(assert_equal("no-such-arg", none(), matches.get_one("no-such-arg")));
+    assert_equal("count", some("100"), matches.get_one("count"));;
+    assert_equal("output", none(), matches.get_one("output"));;
+    assert_equal("TARGET", some("mytarget"), matches.get_one("TARGET"));;
+    assert_equal("FILE", none(), matches.get_many("FILE"));;
+    assert_equal("force", some("true"), matches.get_one("force"));;
+    assert_equal("verbose", some("true"), matches.get_one("verbose"));;
+    assert_equal("no-such-arg", none(), matches.get_one("no-such-arg"));;
     pure()
 );
 
@@ -227,11 +227,11 @@ test_matches_rich_run = make_test("test_matches_rich_run") $ |_| (
     let inputs = "rich run in1.txt".split(" ").to_array;
     let matches = *command.get_matches_from(inputs).from_result;
     let opt = matches.subcommand;
-    let _ = *(assert_true("subcommand", opt.is_some));
+    assert_true("subcommand", opt.is_some);;
     let (name, submatches) = opt.as_some;
-    let _ = *(assert_equal("name", "run", name));
-    let _ = *(assert_equal("FILE", some(["in1.txt"]), submatches.get_many("FILE")));
-    let _ = *(assert_equal("verbose", none(), submatches.get_one("verbose")));
+    assert_equal("name", "run", name);;
+    assert_equal("FILE", some(["in1.txt"]), submatches.get_many("FILE"));;
+    assert_equal("verbose", none(), submatches.get_one("verbose"));;
     pure()
 );
 
@@ -241,12 +241,12 @@ test_matches_rich_build = make_test("test_matches_rich_build") $ |_| (
     let inputs = "rich build in1.txt in2.txt -v -d mylib -v".split(" ").to_array;
     let matches = *command.get_matches_from(inputs).from_result;
     let opt = matches.subcommand;
-    let _ = *(assert_true("subcommand", opt.is_some));
+    assert_true("subcommand", opt.is_some);;
     let (name, submatches) = opt.as_some;
-    let _ = *(assert_equal("name", "build", name));
-    let _ = *(assert_equal("FILE", some(["in1.txt", "in2.txt"]), submatches.get_many("FILE")));
-    let _ = *(assert_equal("dynamic_lib", some("mylib"), submatches.get_one("dynamic_lib")));
-    let _ = *(assert_equal("verbose", some("2"), submatches.get_one("verbose")));
+    assert_equal("name", "build", name);;
+    assert_equal("FILE", some(["in1.txt", "in2.txt"]), submatches.get_many("FILE"));;
+    assert_equal("dynamic_lib", some("mylib"), submatches.get_one("dynamic_lib"));;
+    assert_equal("verbose", some("2"), submatches.get_one("verbose"));;
     pure()
 );
 
@@ -256,8 +256,8 @@ test_error = |command, cmdline, expected| (
     make_test(testname) $ |_|
     let inputs = cmdline.split(" ").to_array;
     let res = command.get_matches_from(inputs);
-    let _ = *(assert_true("err", res.is_err));
-    let _ = *(assert_equal("err", expected, res.as_err));
+    assert_true("err", res.is_err);;
+    assert_equal("err", expected, res.as_err);;
     pure()
 );
 
