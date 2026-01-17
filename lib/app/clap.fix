@@ -1,5 +1,9 @@
 // Command line argument parser.
 // Inspired by [`clap` crate of Rust](https://docs.rs/clap/3.2.0/clap/index.html).
+//
+// ## Changes in 0.6.0
+// - The effect of a boolean arg, which has a `set_true()` or a `set_false()` action,
+//   will be negated if `--no-{long-option}` is specified in the command line.
 module Minilib.App.Clap;
 
 import HashMap;
@@ -14,13 +18,20 @@ namespace ArgAction {
 
     // The action taken when the argument is parsed.
     type ArgAction = unbox union {
-        set: (),        // Sets next input to the single argument value.
-        append: (),     // Appends next input to the array of argument values.
-        set_true: (),   // Sets "true" as the single argument value.
-        set_false: (),  // Sets "false" as the single argument value.
-        increment: (),  // Increment the argument value as an integer.
-        help: (),       // Displays help for the command.
-        version: ()     // Displays the version of the command.
+        // Sets next input to the single argument value.
+        set: (),
+        // Appends next input to the array of argument values.
+        append: (),
+        // Sets "true" as the single argument value.
+        set_true: (),
+        // Sets "false" as the single argument value.
+        set_false: (),
+        // Increment the argument value as an integer.
+        increment: (),
+        // Displays help for the command.
+        help: (),
+        // Displays the version of the command.
+        version: ()
     };
 }
 
@@ -33,16 +44,26 @@ namespace ArgAction {
 // If either `short` or `long` is set, it becomes an optional argument.
 // Otherwise, it is a positional argument.
 type Arg = unbox struct {
-    id: String,             // A unique ID that identifies the argument.
-    short: U8,              // A one-hypen option, eg. `-n`
-    long: String,           // A two-hypen option, eg. `--count`
-    required: Bool,         // Whether the argument is required or not.
-    takes_value: Bool,      // Whether the argument takes some value.
-    multiple_values: Bool,  // Whether the argument value(s) is singule or multiple.
-    default_value: Option String,   // A default value of the argument.
-    value_name: String,     // The name of the argument value which is displayed in help message.
-    help: String,           // The help message of the argument.
-    action: ArgAction       // The action taken when the argument is parsed.
+    // A unique ID that identifies the argument.
+    id: String,
+    // A one-hypen option, eg. `-n`
+    short: U8,
+    // A two-hypen option, eg. `--count`
+    long: String,
+    // Whether the argument is required or not.
+    required: Bool,
+    // Whether the argument takes some value.
+    takes_value: Bool,
+    // Whether the argument value(s) is singule or multiple.
+    multiple_values: Bool,
+    // A default value of the argument.
+    default_value: Option String,
+    // The name of the argument value which is displayed in help message.
+    value_name: String,
+    // The help message of the argument.
+    help: String,
+    // The action taken when the argument is parsed.
+    action: ArgAction
 };
 
 namespace Arg {
@@ -177,21 +198,35 @@ impl Arg: ToString {
 
 // A structure representing a command (ie. application).
 type Command = box struct {
-    name: String,           // The name of the command.
-    bin_name: String,       // The name of the executable binary of the command.
-    display_name: String,   // The display name of the command.
-    subcommand_path: String, // The subcommands that invokes this command.
-    version: String,        // The version of the command.
-    author: String,         // Author of the command.
-    about: String,          // Description about the command.
-    subcommands: Array Command, // Array of subcommands.
-    args: Array Arg,        // Argument definitions of the command.
-    help_template: HelpTemplate,    // A help template of the command.
-    version_template: HelpTemplate  // A version template of the command.
+    // The name of the command.
+    name: String,
+    // The name of the executable binary of the command.
+    bin_name: String,
+    // The display name of the command.
+    display_name: String,
+    // The subcommands that invokes this command.
+    subcommand_path: String,
+    // The version of the command.
+    version: String,
+    // The author of the command.
+    author: String,
+    // The description about the command.
+    about: String,
+    // Array of subcommands.
+    subcommands: Array Command,
+    // Argument definitions of the command.
+    args: Array Arg,
+    // A help template of the command.
+    help_template: HelpTemplate,
+    // A version template of the command.
+    version_template: HelpTemplate
 };
 
 namespace Command {
     // Creates a command structure by specifying the command name.
+    //
+    // # Parameters
+    // - `name`: The name of the command
     new: String -> Command;
     new = |name| (
         Command {
@@ -210,26 +245,50 @@ namespace Command {
     );
 
     // Sets the name of the command.
+    //
+    // # Parameters
+    // - `name`: The name of the command
+    // - `command`: A command
     name: String -> Command -> Command;
     name = set_name;
 
     // Sets the name of the executable binary of the command.
+    //
+    // # Parameters
+    // - `bin_name`: The name of the executable binary of the command
+    // - `command`: A command
     bin_name: String -> Command -> Command;
     bin_name = set_bin_name;
 
     // Sets the display name of the command.
+    //
+    // # Parameters
+    // - `display_name`: The display name of the command
+    // - `command`: A command
     display_name: String -> Command -> Command;
     display_name = set_display_name;
 
     // Sets the version of the command.
+    //
+    // # Parameters
+    // - `version`: The version of the command
+    // - `command`: A command
     version: String -> Command -> Command;
     version = set_version;
 
     // Sets the author of the command.
+    //
+    // # Parameters
+    // - `author`: The author of the command
+    // - `command`: A command
     author: String -> Command -> Command;
     author = set_author;
 
     // Sets the description about the command.
+    //
+    // # Parameters
+    // - `about`: The description about the command
+    // - `command`: A command
     about: String -> Command -> Command;
     about = set_about;
 
@@ -249,12 +308,20 @@ namespace Command {
     );
 
     // Add an argument definition to the command.
+    //
+    // # Parameters
+    // - `arg`: An argument definition to the command
+    // - `command`: A command
     arg: Arg -> Command -> Command;
     arg = |arg, command| (
         command.mod_args(|args| args.push_back(arg))
     );
 
     // Add a subcommand to the command.
+    //
+    // # Parameters
+    // - `subcommand`: A subcommand
+    // - `command`: A command
     subcommand: Command -> Command -> Command;
     subcommand = |subcommand, command| (
         let subcommand = subcommand.set_bin_name(command.@bin_name);
@@ -265,19 +332,22 @@ namespace Command {
     );
 
     // Generates a help string based on the help template.
-    render_help: Command -> String;
-    render_help = |command| (
+    _render_help: Command -> String;
+    _render_help = |command| (
         command.@help_template.format(command)
     );
 
     // Generates a version string based on the version template.
-    render_version: Command -> String;
-    render_version = |command| (
+    _render_version: Command -> String;
+    _render_version = |command| (
         command.@version_template.format(command)
     );
 
     // Parse command line arguments based on `IO::get_args`.
     // If `--help` or `--version` is specified, the help string or version string will be returned as `throw`.
+    //
+    // # Parameters
+    // - `command`: A command
     get_matches: Command -> IOFail ArgMatches;
     get_matches = |command| (
         let inputs = *IO::get_args.lift;
@@ -286,6 +356,10 @@ namespace Command {
 
     // Parses command line arguments based on the specified input array.
     // If `--help` or `--version` is specified, the help string or version string will be returned as the error message.
+    //
+    // # Parameters
+    // - `inputs`: An input array
+    // - `command`: A command
     get_matches_from: Array String -> Command -> Result ErrMsg ArgMatches;
     get_matches_from = |inputs, command| (
         if command.@subcommands.get_size > 0 {
@@ -305,14 +379,14 @@ namespace Command {
         // drop first argument as it is the executable name
         let inputs = inputs.to_iter.get_tail.map_or([], to_array);
         if inputs.get_size == 0 {
-            err $ command.render_help
+            err $ command._render_help
         };
         let subcommand_name = inputs.@(0);
         let subcommand = command.@subcommands.to_iter
             .filter(|subcommand| subcommand.@name == subcommand_name)
             .get_first;
         if subcommand.is_none {
-            err $ command.render_help
+            err $ command._render_help
         };
         let subcommand = subcommand.as_some;
         let submatches = *subcommand.get_matches_from(inputs);
@@ -325,6 +399,7 @@ namespace Command {
 // ---------------------------------
 namespace ArgParser
 {
+    // Argument parser. (used internally)
     type ArgParser = unbox struct {
         command: Command,
         remaining_args: DynIterator Arg,
@@ -433,10 +508,10 @@ namespace ArgParser
     _perform_action = |arg, parser| (
         let action = arg.@action;
         if action.is_help {
-            err $ parser.@command.render_help
+            err $ parser.@command._render_help
         };
         if action.is_version {
-            err $ parser.@command.render_version
+            err $ parser.@command._render_version
         };
         if action.is_set_true || action.is_set_false {
             let value = if action.is_set_true { "true" } else { "false" };
