@@ -1,6 +1,47 @@
 // Command line argument parser.
 // Inspired by [`clap` crate of Rust](https://docs.rs/clap/3.2.0/clap/index.html).
 //
+// ## How to use
+//
+// 1. Create a command definition. 
+//    - A command definition (`Command`) might have a name, a version, the author,
+//      as well as argument definitions.
+//    - An argument definition (`Arg`) might have an ID, a short option, a long option,
+//      a help message, default value etc.
+// 2. Parse a command line using `command.get_matches`.
+// 3. Get the values of the arguments from `ArgMatches`.
+//
+// Example:
+// ```
+// typical_command: Command;
+// typical_command = (
+//     Command::new("typical_tool")
+//     .bin_name("typical")
+//     .display_name("TypicalTool")
+//     .version("1.0.0")
+//     .author("somebody <somebody@example.com>")
+//     .arg(Arg::new("TARGET").help("Target").takes_value.required)
+//     .arg(Arg::new("FILE").help("Input files").takes_multiple_values)
+//     .arg(Arg::new("count").short('n').long("count").help("How many times to iterate")
+//         .takes_value.value_name("NUMBER").default_value("100"))
+//     .arg(Arg::new("output").short('o').long("output").help("An output file")
+//         .takes_value.value_name("OUTFILE"))
+// );
+// 
+// main: IO ();
+// main = do {
+//     // Parse a command line.
+//     let matches: ArgMatches = *command.get_matches;
+//     // Get the values of the arguments from `ArgMatches`.
+//     let target: String = *matches.get_one("TARGET").as_some;
+//     let files: Option (Array String) = *matches.get_many("FILE");
+//     let count: I64 = *matches.get_one("count").as_some.from_string.from_result;
+//     let output: Option String = *matches.get_one("output");
+//     ...
+// }.try(eprintln);
+// 
+// ```
+//
 // ## Changes in 0.6.0
 // - The effect of a boolean arg, which has a `set_true()` or a `set_false()` action,
 //   will be negated if `--no-{long-option}` is specified in the command line.
