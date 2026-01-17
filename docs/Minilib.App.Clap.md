@@ -1,9 +1,55 @@
 # Minilib.App.Clap
 
-Defined in minilib-app@0.5.5
+Defined in minilib-app@0.6.1
 
 Command line argument parser.
 Inspired by [`clap` crate of Rust](https://docs.rs/clap/3.2.0/clap/index.html).
+
+## How to use
+
+1. Create a command definition.
+   - A command definition (`Command`) might have a name, a version, the author,
+     as well as argument definitions.
+   - An argument definition (`Arg`) might have an ID, a short option, a long option,
+     a help message, default value etc.
+2. Parse a command line using `command.get_matches`.
+3. Get the values of the arguments from `ArgMatches`.
+
+Example:
+```
+typical_command: Command;
+typical_command = (
+    Command::new("typical_tool")
+    .bin_name("typical")
+    .display_name("TypicalTool")
+    .version("1.0.0")
+    .author("somebody <somebody@example.com>")
+    .arg(Arg::new("TARGET").help("Target").takes_value.required)
+    .arg(Arg::new("FILE").help("Input files").takes_multiple_values)
+    .arg(Arg::new("count").short('n').long("count").help("How many times to iterate")
+        .takes_value.value_name("NUMBER").default_value("100"))
+    .arg(Arg::new("output").short('o').long("output").help("An output file")
+        .takes_value.value_name("OUTFILE"))
+);
+
+main: IO ();
+main = do {
+    // Parse a command line.
+    let matches: ArgMatches = *command.get_matches;
+    // Get the values of the arguments from `ArgMatches`.
+    let target: String = *matches.get_one("TARGET").as_some;
+    let files: Option (Array String) = *matches.get_many("FILE");
+    let count: I64 = *matches.get_one("count").as_some.from_string.from_result;
+    let output: Option String = *matches.get_one("output");
+    ...
+}.try(eprintln);
+
+```
+
+## Changes in 0.6.0
+
+- The effect of a boolean arg, which has a `set_true()` or a `set_false()` action,
+  will be negated if `--no-{long-option}` is specified in the command line.
 
 ## Values
 
@@ -151,11 +197,21 @@ Type: `Std::String -> Minilib.App.Clap::Command -> Minilib.App.Clap::Command`
 
 Sets the description about the command.
 
+##### Parameters
+
+- `about`: The description about the command
+- `command`: A command
+
 #### arg
 
 Type: `Minilib.App.Clap::Arg -> Minilib.App.Clap::Command -> Minilib.App.Clap::Command`
 
 Add an argument definition to the command.
+
+##### Parameters
+
+- `arg`: An argument definition to the command
+- `command`: A command
 
 #### author
 
@@ -163,17 +219,32 @@ Type: `Std::String -> Minilib.App.Clap::Command -> Minilib.App.Clap::Command`
 
 Sets the author of the command.
 
+##### Parameters
+
+- `author`: The author of the command
+- `command`: A command
+
 #### bin_name
 
 Type: `Std::String -> Minilib.App.Clap::Command -> Minilib.App.Clap::Command`
 
 Sets the name of the executable binary of the command.
 
+##### Parameters
+
+- `bin_name`: The name of the executable binary of the command
+- `command`: A command
+
 #### display_name
 
 Type: `Std::String -> Minilib.App.Clap::Command -> Minilib.App.Clap::Command`
 
 Sets the display name of the command.
+
+##### Parameters
+
+- `display_name`: The display name of the command
+- `command`: A command
 
 #### get_matches
 
@@ -182,6 +253,10 @@ Type: `Minilib.App.Clap::Command -> Std::IO::IOFail Minilib.App.Clap::ArgMatches
 Parse command line arguments based on `IO::get_args`.
 If `--help` or `--version` is specified, the help string or version string will be returned as `throw`.
 
+##### Parameters
+
+- `command`: A command
+
 #### get_matches_from
 
 Type: `Std::Array Std::String -> Minilib.App.Clap::Command -> Std::Result Std::ErrMsg Minilib.App.Clap::ArgMatches`
@@ -189,11 +264,21 @@ Type: `Std::Array Std::String -> Minilib.App.Clap::Command -> Std::Result Std::E
 Parses command line arguments based on the specified input array.
 If `--help` or `--version` is specified, the help string or version string will be returned as the error message.
 
+##### Parameters
+
+- `inputs`: An input array
+- `command`: A command
+
 #### name
 
 Type: `Std::String -> Minilib.App.Clap::Command -> Minilib.App.Clap::Command`
 
 Sets the name of the command.
+
+##### Parameters
+
+- `name`: The name of the command
+- `command`: A command
 
 #### new
 
@@ -201,17 +286,9 @@ Type: `Std::String -> Minilib.App.Clap::Command`
 
 Creates a command structure by specifying the command name.
 
-#### render_help
+##### Parameters
 
-Type: `Minilib.App.Clap::Command -> Std::String`
-
-Generates a help string based on the help template.
-
-#### render_version
-
-Type: `Minilib.App.Clap::Command -> Std::String`
-
-Generates a version string based on the version template.
+- `name`: The name of the command
 
 #### subcommand
 
@@ -219,11 +296,21 @@ Type: `Minilib.App.Clap::Command -> Minilib.App.Clap::Command -> Minilib.App.Cla
 
 Add a subcommand to the command.
 
+##### Parameters
+
+- `subcommand`: A subcommand
+- `command`: A command
+
 #### version
 
 Type: `Std::String -> Minilib.App.Clap::Command -> Minilib.App.Clap::Command`
 
 Sets the version of the command.
+
+##### Parameters
+
+- `version`: The version of the command
+- `command`: A command
 
 ### namespace Minilib.App.Clap::HelpTemplate
 
@@ -252,41 +339,61 @@ Otherwise, it is a positional argument.
 
 Type: `Std::String`
 
+A unique ID that identifies the argument.
+
 ##### field `short`
 
 Type: `Std::U8`
+
+A one-hypen option, eg. `-n`
 
 ##### field `long`
 
 Type: `Std::String`
 
+A two-hypen option, eg. `--count`
+
 ##### field `required`
 
 Type: `Std::Bool`
+
+Whether the argument is required or not.
 
 ##### field `takes_value`
 
 Type: `Std::Bool`
 
+Whether the argument takes some value.
+
 ##### field `multiple_values`
 
 Type: `Std::Bool`
+
+Whether the argument value(s) is singule or multiple.
 
 ##### field `default_value`
 
 Type: `Std::Option Std::String`
 
+A default value of the argument.
+
 ##### field `value_name`
 
 Type: `Std::String`
+
+The name of the argument value which is displayed in help message.
 
 ##### field `help`
 
 Type: `Std::String`
 
+The help message of the argument.
+
 ##### field `action`
 
 Type: `Minilib.App.Clap::ArgAction::ArgAction`
+
+The action taken when the argument is parsed.
 
 #### ArgMatches
 
@@ -312,45 +419,67 @@ A structure representing a command (ie. application).
 
 Type: `Std::String`
 
+The name of the command.
+
 ##### field `bin_name`
 
 Type: `Std::String`
+
+The name of the executable binary of the command.
 
 ##### field `display_name`
 
 Type: `Std::String`
 
+The display name of the command.
+
 ##### field `subcommand_path`
 
 Type: `Std::String`
+
+The subcommands that invokes this command.
 
 ##### field `version`
 
 Type: `Std::String`
 
+The version of the command.
+
 ##### field `author`
 
 Type: `Std::String`
+
+The author of the command.
 
 ##### field `about`
 
 Type: `Std::String`
 
+The description about the command.
+
 ##### field `subcommands`
 
 Type: `Std::Array Minilib.App.Clap::Command`
+
+Array of subcommands.
 
 ##### field `args`
 
 Type: `Std::Array Minilib.App.Clap::Arg`
 
+Argument definitions of the command.
+
 ##### field `help_template`
 
 Type: `Minilib.App.Clap::HelpTemplate`
 
+A help template of the command.
+
 ##### field `version_template`
 
 Type: `Minilib.App.Clap::HelpTemplate`
+
+A version template of the command.
 
 #### HelpTemplate
 
@@ -372,35 +501,51 @@ The action taken when the argument is parsed.
 
 Type: `()`
 
+Sets next input to the single argument value.
+
 ##### variant `append`
 
 Type: `()`
+
+Appends next input to the array of argument values.
 
 ##### variant `set_true`
 
 Type: `()`
 
+Sets "true" as the single argument value.
+
 ##### variant `set_false`
 
 Type: `()`
+
+Sets "false" as the single argument value.
 
 ##### variant `increment`
 
 Type: `()`
 
+Increment the argument value as an integer.
+
 ##### variant `help`
 
 Type: `()`
 
+Displays help for the command.
+
 ##### variant `version`
 
 Type: `()`
+
+Displays the version of the command.
 
 ### namespace Minilib.App.Clap::ArgParser
 
 #### ArgParser
 
 Defined as: `type ArgParser = unbox struct { ...fields... }`
+
+Argument parser. (used internally)
 
 ##### field `command`
 
