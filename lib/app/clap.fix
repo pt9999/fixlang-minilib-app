@@ -107,6 +107,18 @@ namespace Arg {
     _is_option: Arg -> Bool;
     _is_option = |arg| !arg._is_positional;
 
+    _is_boolean_action: Arg -> Bool;
+    _is_boolean_action = |arg| arg.@action.is_set_true || arg.@action.is_set_false;
+
+    _negate_boolean_action: Arg -> Arg;
+    _negate_boolean_action = |arg| (
+        arg.mod_action(|action|
+            if action.is_set_true { set_false() };
+            if action.is_set_false { set_true() };
+            action
+        )
+    );
+
     _short_to_string: Arg -> String;
     _short_to_string = |arg| (
         ['-', arg.@short]._unsafe_to_string
@@ -115,6 +127,11 @@ namespace Arg {
     _long_to_string: Arg -> String;
     _long_to_string = |arg| (
         "--" + arg.@long
+    );
+
+    _negated_long_to_string: Arg -> String;
+    _negated_long_to_string = |arg| (
+        "--no-" + arg.@long
     );
 
     _positional_to_string: Arg -> String;
@@ -127,15 +144,18 @@ namespace Arg {
         }
     );
 
-    _option_matches: String -> Arg -> Bool;
+    _option_matches: String -> Arg -> Option Arg;
     _option_matches = |input, arg| (
         if arg.@short != 0_U8 && arg._short_to_string == input {
-            true
+            some $ arg
         };
         if arg.@long != "" && arg._long_to_string == input {
-            true
+            some $ arg
         };
-        false
+        if arg.@long != "" && arg._is_boolean_action && arg._negated_long_to_string == input {
+            some $ arg._negate_boolean_action
+        };
+        none()
     );
 }
 
@@ -378,7 +398,7 @@ namespace ArgParser
     _process_option_arg = |parser| (
         let (input, parser) = *parser.advance;
         let remaining_option_args = parser.@remaining_args.filter(_is_option);
-        let matched_args = remaining_option_args.filter(_option_matches(input));
+        let matched_args = remaining_option_args.filter_map(_option_matches(input));
         if matched_args.is_empty {
             err $ "Found argument '" + input + "' which wasn't expected, or isn't valid in this context"
         };

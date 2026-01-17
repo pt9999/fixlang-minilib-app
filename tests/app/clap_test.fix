@@ -2,6 +2,7 @@ module ClapTest;
 
 import HashMap;
 
+import Minilib.Common.Common;
 import Minilib.App.Clap;
 import Minilib.Testing.UnitTest;
 
@@ -23,6 +24,7 @@ typical_command = (
         .takes_value.value_name("OUTFILE"))
     .arg(Arg::new("force").short('f'))
     .arg(Arg::new("verbose").long("verbose").help("Verbose mode"))
+    .arg(Arg::new("verify").long("verify").help("Verify mode").default_value("true"))
     .arg(Arg::new("TARGET").help("Target").takes_value.required)
     .arg(Arg::new("FILE").help("Input files").takes_multiple_values)
 );
@@ -49,6 +51,23 @@ rich_command = (
         .arg(Arg::new("dynamic_lib").short('d').help("Dynamic library").takes_value.value_name("LIB"))
         .arg(Arg::new("verbose").short('v').help("Increment verbose level").set_action(ArgAction::increment()))
     )
+);
+
+test_new_arg: TestCase;
+test_new_arg = (
+    make_test("test_new_arg") $ |_|
+    let arg = Arg::new("aaa");
+    assert_equal("id", "aaa", arg.@id);;
+    assert_equal("short", 0_U8, arg.@short);;
+    assert_equal("long", "", arg.@long);;
+    assert_equal("required", false, arg.@required);;
+    assert_equal("takes_value", false, arg.@takes_value);;
+    assert_equal("multiple_values", false, arg.@multiple_values);;
+    assert_equal("default_value", none(), arg.@default_value);;
+    assert_equal("value_name", "VALUE", arg.@value_name);;
+    assert_equal("help", "", arg.@help);;
+    assert_true("action", arg.@action.is_set_true);;
+    pure()
 );
 
 test_help_empty: TestCase;
@@ -90,7 +109,8 @@ test_help_typical = make_test("test_help_typical") $ |_| (
         "    -n, --count <NUMBER>        How many times to iterate (default: 100)\n" +
         "    -o, --output <OUTFILE>      An output file\n" +
         "    -f                          \n" +
-        "        --verbose               Verbose mode\n"
+        "        --verbose               Verbose mode\n" +
+        "        --verify                Verify mode (default: true)\n"
     );
     let res = command.get_matches_from(["typical", "--help"]);
     assert_true("err", res.is_err);;
@@ -202,6 +222,7 @@ test_matches_typical = make_test("test_matches_typical") $ |_| (
     assert_equal("FILE", some(["in.txt", "-in2.txt"]), matches.get_many("FILE"));;
     assert_equal("force", none(), matches.get_one("force"));;
     assert_equal("verbose", none(), matches.get_one("verbose"));;
+    assert_equal("verify", some("true"), matches.get_one("verify"));;
     assert_equal("no-such-arg", none(), matches.get_one("no-such-arg"));;
     pure()
 );
@@ -209,7 +230,7 @@ test_matches_typical = make_test("test_matches_typical") $ |_| (
 test_matches_typical2: TestCase;
 test_matches_typical2 = make_test("test_matches_typical2") $ |_| (
     let command = typical_command;
-    let inputs = "typical mytarget -f --verbose".split(" ").to_array;
+    let inputs = "typical mytarget -f --verbose --no-verify".split(" ").to_array;
     let matches = *command.get_matches_from(inputs).from_result;
     assert_equal("count", some("100"), matches.get_one("count"));;
     assert_equal("output", none(), matches.get_one("output"));;
@@ -217,6 +238,7 @@ test_matches_typical2 = make_test("test_matches_typical2") $ |_| (
     assert_equal("FILE", none(), matches.get_many("FILE"));;
     assert_equal("force", some("true"), matches.get_one("force"));;
     assert_equal("verbose", some("true"), matches.get_one("verbose"));;
+    assert_equal("verify", some("false"), matches.get_one("verify"));;
     assert_equal("no-such-arg", none(), matches.get_one("no-such-arg"));;
     pure()
 );
@@ -250,6 +272,40 @@ test_matches_rich_build = make_test("test_matches_rich_build") $ |_| (
     pure()
 );
 
+test_matches_boolean: TestCase;
+test_matches_boolean = (
+    make_table_test("test_matches_boolean", 
+        do {
+            let _default_value = *[none(), some("true"), some("false")];
+            let _action = *["", "set_true", "set_false"];
+            let _option = *["", "--arg", "--no-arg"];
+            let _expected = (
+                if _option == "--arg" {
+                    if _action == "set_false" { some("false") } else { some("true") }
+                } else if _option == "--no-arg" {
+                    if _action == "set_false" { some("true") } else { some("false") }
+                } else {
+                    _default_value
+                }
+            );
+            pure $ (_default_value, _action, _option, _expected)    
+        },
+        |(_default_value, _action, _option, _expected)|
+        let command = Command::new("command").arg(
+            let arg = Arg::new("arg").long("arg");
+            let arg = if _default_value.is_some { arg.default_value(_default_value.as_some) } else { arg };
+            let arg = if _action == "set_true" { arg.set_action(set_true()) } 
+            else if _action == "set_false" { arg.set_action(set_false()) }
+            else { arg };
+            arg
+        );
+        let inputs = ("command " + _option).split(" ").filter(|s| !s.is_empty).to_array;
+        let matches = *command.get_matches_from(inputs).from_result;
+        assert_equal("arg", _expected, matches.get_one("arg"));;
+        pure()
+    )
+);
+
 test_error: Command -> String -> String -> TestCase;
 test_error = |command, cmdline, expected| (
     let testname = "test_error(" + cmdline + ")";
@@ -277,6 +333,7 @@ test_errors = (
 main: IO ();
 main = (
     [
+        test_new_arg,
         test_help_empty,
         test_help_typical,
         test_help_rich,
@@ -287,6 +344,7 @@ main = (
         test_matches_typical2,
         test_matches_rich_run,
         test_matches_rich_build,
+        test_matches_boolean,
         test_errors,
         TestCase::empty
     ]
