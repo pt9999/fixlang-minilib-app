@@ -1,3 +1,7 @@
+## 0.7.1
+### Changed
+- Utilized minilib-common@0.12.3.
+
 ## 0.7.0
 ### Changed
 - fixproj.toml: Bumped `fix_version` to 1.3.0. Depends on minilib-common@0.12.0.

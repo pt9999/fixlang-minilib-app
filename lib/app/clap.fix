@@ -183,7 +183,7 @@ namespace Arg {
 
     _short_to_string: Arg -> String;
     _short_to_string = |arg| (
-        ['-', arg.@short]._unsafe_to_string
+        StringEx::from_array $ ['-', arg.@short]
     );
 
     _long_to_string: Arg -> String;
@@ -805,7 +805,7 @@ namespace HelpTemplate {
     _format_arg = |arg| (
         let line = "    " + arg.to_string;
         let line = if line.get_size >= 14 { line } else {
-            line + Array::fill(14 - line.get_size, ' ')._unsafe_to_string
+            line + StringEx::fill(14 - line.get_size, ' ')
         };
         let line = line + " " + arg.@help;
         line + "\n"
@@ -832,7 +832,7 @@ namespace HelpTemplate {
             }
         );
         let line = if line.get_size >= 32 { line } else {
-            line + Array::fill(32 - line.get_size, ' ')._unsafe_to_string
+            line + StringEx::fill(32 - line.get_size, ' ')
         };
         let line = line + arg.@help;
         let line = if arg.@default_value.is_none { line } else {
@@ -845,7 +845,7 @@ namespace HelpTemplate {
     _format_subcommand = |command| (
         let line = "    " + command.@name;
         let line = if line.get_size >= 15 { line } else {
-            line + Array::fill(15 - line.get_size, ' ')._unsafe_to_string
+            line + StringEx::fill(15 - line.get_size, ' ')
         };
         let line = line + command.@about;
         line + "\n"
