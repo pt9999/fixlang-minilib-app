@@ -818,9 +818,7 @@ namespace HelpTemplate {
             if options.get_size == 0 { "" } else { " [OPTIONS]" }
         );
         let usage = usage + (
-            if args.get_size == 0 { "" } else {
-                args.to_iter.map(|arg| " " + arg.to_string).concat_iter
-            }
+            args.to_iter.map(|arg| " " + arg.to_string).concat_iter
         );
         let usage = usage + (
             if subcommands.get_size == 0 { "" } else { " [SUBCOMMAND]" }
@@ -859,9 +857,7 @@ namespace HelpTemplate {
     _format_arg: Arg -> String;
     _format_arg = |arg| (
         let line = "    " + arg.to_string;
-        let line = if line.get_size >= 14 { line } else {
-            line + StringEx::fill(14 - line.get_size, ' ')
-        };
+        let line = line.pad_right(14, ' ');
         let line = line + " " + arg.@help;
         line + "\n"
     );
@@ -886,22 +882,16 @@ namespace HelpTemplate {
                 "<" + arg.@value_name + ">"
             }
         );
-        let line = if line.get_size >= 32 { line } else {
-            line + StringEx::fill(32 - line.get_size, ' ')
-        };
+        let line = line.pad_right(32, ' ');
         let line = line + arg.@help;
-        let line = if arg.@default_value.is_none { line } else {
-            line + " (default: " + arg.@default_value.as_some + ")"
-        };
+        let line = line + arg.@default_value.map_or("", |value| " (default: " + value + ")");
         line + "\n"
     );
 
     _format_subcommand: Command -> String;
     _format_subcommand = |command| (
         let line = "    " + command.@name;
-        let line = if line.get_size >= 15 { line } else {
-            line + StringEx::fill(15 - line.get_size, ' ')
-        };
+        let line = line.pad_right(15, ' ');
         let line = line + command.@about;
         line + "\n"
     );
