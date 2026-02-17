@@ -3,7 +3,7 @@
 //
 // ## How to use
 //
-// 1. Create a command definition. 
+// 1. Create a command definition.
 //    - A command definition (`Command`) might have a name, a version, the author,
 //      as well as argument definitions.
 //    - An argument definition (`Arg`) might have an ID, a short option, a long option,
@@ -27,7 +27,7 @@
 //     .arg(Arg::new("output").short('o').long("output").help("An output file")
 //         .takes_value.value_name("OUTFILE"))
 // );
-// 
+//
 // main: IO ();
 // main = do {
 //     // Parse a command line.
@@ -39,7 +39,7 @@
 //     let output: Option String = *matches.get_one("output");
 //     ...
 // }.try(eprintln);
-// 
+//
 // ```
 //
 // ## Changes in 0.6.0

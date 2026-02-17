@@ -274,7 +274,7 @@ test_matches_rich_build = make_test("test_matches_rich_build") $ |_| (
 
 test_matches_boolean: TestCase;
 test_matches_boolean = (
-    make_table_test("test_matches_boolean", 
+    make_table_test("test_matches_boolean",
         do {
             let _default_value = *[none(), some("true"), some("false")];
             let _action = *["", "set_true", "set_false"];
@@ -288,13 +288,13 @@ test_matches_boolean = (
                     _default_value
                 }
             );
-            pure $ (_default_value, _action, _option, _expected)    
+            pure $ (_default_value, _action, _option, _expected)
         },
         |(_default_value, _action, _option, _expected)|
         let command = Command::new("command").arg(
             let arg = Arg::new("arg").long("arg");
             let arg = if _default_value.is_some { arg.default_value(_default_value.as_some) } else { arg };
-            let arg = if _action == "set_true" { arg.set_action(set_true()) } 
+            let arg = if _action == "set_true" { arg.set_action(set_true()) }
             else if _action == "set_false" { arg.set_action(set_false()) }
             else { arg };
             arg
