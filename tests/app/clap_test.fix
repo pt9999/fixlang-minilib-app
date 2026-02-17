@@ -223,6 +223,7 @@ test_matches_typical = make_test("test_matches_typical") $ |_| (
     assert_equal("force", none(), matches.get_one("force"));;
     assert_equal("verbose", none(), matches.get_one("verbose"));;
     assert_equal("verify", some("true"), matches.get_one("verify"));;
+    assert_equal("verify get_flag", true, matches.get_flag("verify"));;
     assert_equal("no-such-arg", none(), matches.get_one("no-such-arg"));;
     pure()
 );
@@ -237,8 +238,11 @@ test_matches_typical2 = make_test("test_matches_typical2") $ |_| (
     assert_equal("TARGET", some("mytarget"), matches.get_one("TARGET"));;
     assert_equal("FILE", none(), matches.get_many("FILE"));;
     assert_equal("force", some("true"), matches.get_one("force"));;
+    assert_equal("force get_flag", true, matches.get_flag("force"));;
     assert_equal("verbose", some("true"), matches.get_one("verbose"));;
+    assert_equal("verbose get_flag", true, matches.get_flag("verbose"));;
     assert_equal("verify", some("false"), matches.get_one("verify"));;
+    assert_equal("verify get_flag", false, matches.get_flag("verify"));;
     assert_equal("no-such-arg", none(), matches.get_one("no-such-arg"));;
     pure()
 );

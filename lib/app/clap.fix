@@ -264,6 +264,10 @@ type Command = box struct {
 };
 
 namespace Command {
+    // An empty command.
+    empty: Command;
+    empty = Command::new("");
+
     // Creates a command structure by specifying the command name.
     //
     // # Parameters
@@ -685,6 +689,11 @@ namespace ArgMatches {
         let array = *matches.get_many(id);
         if array.get_size == 0 { none() };
         some(array.@(0))
+    );
+
+    get_flag: String -> ArgMatches -> Bool;
+    get_flag = |id, matches| (
+        matches.get_one(name) == some("true")
     );
 
     _set_values: String -> Array String -> ArgMatches -> ArgMatches;
