@@ -9,7 +9,7 @@
 //    - An argument definition (`Arg`) might have an ID, a short option, a long option,
 //      a help message, default value etc.
 // 2. Parse a command line using `command.get_matches`.
-// 3. Get the values of the arguments from `ArgMatches`.
+// 3. Get the values of the arguments from the argument matchings (`ArgMatches`).
 //
 // Example:
 // ```
@@ -81,7 +81,8 @@ namespace ArgAction {
 //  Arg
 //----------------------------------------------
 
-// A structure that defines arguments.
+// An argument definition.
+//
 // Arguments can be either optional or positional arguments.
 // If either `short` or `long` is set, it becomes an optional argument.
 // Otherwise, it is a positional argument.
@@ -238,7 +239,7 @@ impl Arg: ToString {
 //  Command
 // ---------------------------------
 
-// A structure representing a command (ie. application).
+// A command definition.
 type Command = box struct {
     // The name of the command.
     name: String,
@@ -265,11 +266,11 @@ type Command = box struct {
 };
 
 namespace Command {
-    // An empty command.
+    // A command definition with empty name.
     empty: Command;
     empty = Command::new("");
 
-    // Creates a command structure by specifying the command name.
+    // Creates a new command definition.
     //
     // # Parameters
     // - `name`: The name of the command
@@ -294,7 +295,7 @@ namespace Command {
     //
     // # Parameters
     // - `name`: The name of the command
-    // - `command`: A command
+    // - `command`: A command definition
     name: String -> Command -> Command;
     name = set_name;
 
@@ -302,7 +303,7 @@ namespace Command {
     //
     // # Parameters
     // - `bin_name`: The name of the executable binary of the command
-    // - `command`: A command
+    // - `command`: A command definition
     bin_name: String -> Command -> Command;
     bin_name = set_bin_name;
 
@@ -310,7 +311,7 @@ namespace Command {
     //
     // # Parameters
     // - `display_name`: The display name of the command
-    // - `command`: A command
+    // - `command`: A command definition
     display_name: String -> Command -> Command;
     display_name = set_display_name;
 
@@ -318,7 +319,7 @@ namespace Command {
     //
     // # Parameters
     // - `version`: The version of the command
-    // - `command`: A command
+    // - `command`: A command definition
     version: String -> Command -> Command;
     version = set_version;
 
@@ -326,7 +327,7 @@ namespace Command {
     //
     // # Parameters
     // - `author`: The author of the command
-    // - `command`: A command
+    // - `command`: A command definition
     author: String -> Command -> Command;
     author = set_author;
 
@@ -334,7 +335,7 @@ namespace Command {
     //
     // # Parameters
     // - `about`: The description about the command
-    // - `command`: A command
+    // - `command`: A command definition
     about: String -> Command -> Command;
     about = set_about;
 
@@ -353,21 +354,21 @@ namespace Command {
         )
     );
 
-    // Add an argument definition to the command.
+    // Adds an argument definition to the command.
     //
     // # Parameters
     // - `arg`: An argument definition to the command
-    // - `command`: A command
+    // - `command`: A command definition
     arg: Arg -> Command -> Command;
     arg = |arg, command| (
         command.mod_args(|args| args.push_back(arg))
     );
 
-    // Add a subcommand to the command.
+    // Adds a subcommand definition to the command.
     //
     // # Parameters
     // - `subcommand`: A subcommand
-    // - `command`: A command
+    // - `command`: A command definition
     subcommand: Command -> Command -> Command;
     subcommand = |subcommand, command| (
         let subcommand = subcommand.set_bin_name(command.@bin_name);
@@ -381,7 +382,7 @@ namespace Command {
     //
     // # Parameters
     // - `name`: A subcommand name
-    // - `command`: A command
+    // - `command`: A command definition
     find_subcommand: String -> Command -> Option Command;
     find_subcommand = |name, command| (
         command.@subcommands.to_iter.filter(|subcommand| subcommand.@name == name).get_first
@@ -403,7 +404,7 @@ namespace Command {
     // If `--help` or `--version` is specified, the help string or version string will be returned as `throw`.
     //
     // # Parameters
-    // - `command`: A command
+    // - `command`: A command definition
     get_matches: Command -> IOFail ArgMatches;
     get_matches = |command| (
         let inputs = *IO::get_args.lift;
@@ -415,7 +416,7 @@ namespace Command {
     //
     // # Parameters
     // - `inputs`: An input array
-    // - `command`: A command
+    // - `command`: A command definition
     get_matches_from: Array String -> Command -> Result ErrMsg ArgMatches;
     get_matches_from = |inputs, command| (
         if command.@subcommands.get_size > 0 {
@@ -455,7 +456,7 @@ namespace Command {
 // ---------------------------------
 namespace ArgParser
 {
-    // Argument parser. (used internally)
+    // Command line argument parser. (used internally)
     type ArgParser = unbox struct {
         command: Command,
         remaining_args: DynIterator Arg,
@@ -669,9 +670,11 @@ namespace ArgParser
 //  ArgMatches
 // ---------------------------------
 
-// A structure representing the result of parsing command line arguments.
+// The argument matchings of the command line.
 type ArgMatches = box struct {
+    // Subcommand name and submatches
     subcommand: Option (String, ArgMatches),
+    // A hashmap from the argument ID to the argument values
     map: HashMap String (Array String)
 };
 
@@ -686,7 +689,7 @@ namespace ArgMatches {
     // Gets the matched subcommand name and matchings for the subcommand.
     //
     // # Parameters
-    // - `matches` Matchings of arguments
+    // - `matches`: Argument matchings
     subcommand: ArgMatches -> Option (String, ArgMatches);
     subcommand = |matches| (
         matches.@subcommand
@@ -695,32 +698,32 @@ namespace ArgMatches {
     // Dispatches subcommands.
     //
     // # Parameters
-    // - `subcommand_runners`: An array of pairs of a subcommand and its runner
-    // - `matches`: The argument matchings for the main command
+    // - `subcommand_handlers`: An array of pairs of subcommands and their handlers
+    // - `matches`: Argument matchings of the main command
     dispatch_subcommands: [m: MonadError] Array (Command, ArgMatches -> m a) -> ArgMatches -> m a;
-    dispatch_subcommands = |subcommand_runners, matches| (
+    dispatch_subcommands = |subcommand_handlers, matches| (
         let (name, submatches) = matches.subcommand.as_some_or(("", ArgMatches::empty));
-        match subcommand_runners.to_iter.filter(|(command, runner)| command.@name == name).get_first {
-            some((command, runner)) => runner(submatches),
+        match subcommand_handlers.to_iter.filter(|(command, handler)| command.@name == name).get_first {
+            some((command, handler)) => handler(submatches),
             none() => error $ "invalid subcommand: " + name
         }
     );
 
-    // Gets the array of argument values with the specified ID.
+    // Gets the plural values of the argument specified by ID.
     //
     // # Parameters
     // - `id`: An argument ID
-    // - `matches` Matchings of arguments
+    // - `matches`: Argument matchings
     get_many: String -> ArgMatches -> Option (Array String);
     get_many = |id, matches| (
         matches.@map.find(id)
     );
 
-    // Gets the value of the argument with the specified ID.
+    // Gets the single value of the argument specified by ID.
     //
     // # Parameters
     // - `id`: An argument ID
-    // - `matches` Matchings of arguments
+    // - `matches`: Argument matchings
     get_one: String -> ArgMatches -> Option String;
     get_one = |id, matches| (
         let array = *matches.get_many(id);
@@ -728,11 +731,11 @@ namespace ArgMatches {
         some(array.@(0))
     );
 
-    // Gets the boolean value of the argument with the specified ID.
+    // Gets the boolean value of the argument specified by ID.
     //
     // # Parameters
     // - `id`: An argument ID
-    // - `matches` Matchings of arguments
+    // - `matches`: Argument matchings
     get_flag: String -> ArgMatches -> Bool;
     get_flag = |id, matches| (
         matches.get_one(id) == some("true")
@@ -755,6 +758,7 @@ namespace ArgMatches {
 //  HelpTemplate
 // ---------------------------------
 
+// A help template. (used internally)
 type HelpTemplate = unbox struct {
     data: String
 };
