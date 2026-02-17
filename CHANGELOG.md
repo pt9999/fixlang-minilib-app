@@ -1,6 +1,6 @@
 ## 0.7.1
 ### Added
-- Minilib.App.Clap: Added `ArgMatches::get_flag`, `Command::empty`.
+- Minilib.App.Clap: Added `Command::empty`, `Command::find_subcommand`, `ArgMatches::get_flag`, `ArgMatches::dispatch_subcommands`.
 ### Changed
 - Utilized minilib-common@0.12.3.
 

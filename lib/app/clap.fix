@@ -49,6 +49,7 @@ module Minilib.App.Clap;
 
 import HashMap;
 
+import Minilib.Monad.Error;
 import Minilib.Text.StringEx;
 
 //----------------------------------------------
@@ -376,6 +377,16 @@ namespace Command {
         command.mod_subcommands(push_back(subcommand))
     );
 
+    // Finds a subcommand with the specified name.
+    //
+    // # Parameters
+    // - `name`: A subcommand name
+    // - `command`: A command
+    find_subcommand: String -> Command -> Option Command;
+    find_subcommand = |name, command| (
+        command.@subcommands.to_iter.filter(|subcommand| subcommand.@name == name).get_first
+    );
+
     // Generates a help string based on the help template.
     _render_help: Command -> String;
     _render_help = |command| (
@@ -681,6 +692,20 @@ namespace ArgMatches {
         matches.@subcommand
     );
 
+    // Dispatches subcommands.
+    //
+    // # Parameters
+    // - `subcommand_runners`: An array of pairs of a subcommand and its runner
+    // - `matches`: The argument matchings for the main command
+    dispatch_subcommands: [m: MonadError] Array (Command, ArgMatches -> m a) -> ArgMatches -> m a;
+    dispatch_subcommands = |subcommand_runners, matches| (
+        let (name, submatches) = matches.subcommand.as_some_or(("", ArgMatches::empty));
+        match subcommand_runners.to_iter.filter(|(command, runner)| command.@name == name).get_first {
+            some((command, runner)) => runner(submatches),
+            none() => error $ "invalid subcommand: " + name
+        }
+    );
+
     // Gets the array of argument values with the specified ID.
     //
     // # Parameters
@@ -710,7 +735,7 @@ namespace ArgMatches {
     // - `matches` Matchings of arguments
     get_flag: String -> ArgMatches -> Bool;
     get_flag = |id, matches| (
-        matches.get_one(name) == some("true")
+        matches.get_one(id) == some("true")
     );
 
     _set_values: String -> Array String -> ArgMatches -> ArgMatches;

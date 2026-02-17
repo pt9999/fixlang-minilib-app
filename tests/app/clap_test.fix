@@ -4,7 +4,9 @@ import HashMap;
 
 import Minilib.Common.Common;
 import Minilib.App.Clap;
+import Minilib.Text.StringEx;
 import Minilib.Testing.UnitTest;
+import Minilib.Trait.Traversable;
 
 empty_command: Command;
 empty_command = (
@@ -276,6 +278,39 @@ test_matches_rich_build = make_test("test_matches_rich_build") $ |_| (
     pure()
 );
 
+test_matches_rich_dispatch_subcommands: TestCase;
+test_matches_rich_dispatch_subcommands = make_test("test_matches_rich_dispatch_subcommands") $ |_| (
+    let command = rich_command;
+    let subcommand_run = command.find_subcommand("run").as_some;
+    let subcommand_build = command.find_subcommand("build").as_some;
+    let handle_run = |submatches| (
+        let file = submatches.get_many("FILE");
+        let verbose = submatches.get_one("verbose");
+        pure $ (file, verbose).format("name=run FILE={} verbose={}")
+    ): IOFail String;
+    let handle_build = |submatches| (
+        let file = submatches.get_many("FILE");
+        let verbose = submatches.get_one("verbose");
+        let dylib = submatches.get_one("dynamic_lib");
+        pure $ (file, verbose, dylib).format("name=build FILE={} verbose={} dylib={}")
+    ): IOFail String;
+
+    [
+        ("rich run in1.txt", "name=run FILE=some([in1.txt]) verbose=none()"),
+        ("rich build in1.txt in2.txt -v -d mylib -v", "name=build FILE=some([in1.txt, in2.txt]) verbose=some(2) dylib=some(mylib)"),
+    ]
+    .to_iter.foreach_m(
+        |(input, expected)|
+        let inputs = input.split(" ").to_array;
+        let matches = *command.get_matches_from(inputs).from_result;
+        let actual = *matches.dispatch_subcommands([
+            (subcommand_run, handle_run),
+            (subcommand_build, handle_build),
+        ]);
+        assert_equal("eq", expected, actual)
+    )
+);
+
 test_matches_boolean: TestCase;
 test_matches_boolean = (
     make_table_test("test_matches_boolean",
@@ -348,6 +383,7 @@ main = (
         test_matches_typical2,
         test_matches_rich_run,
         test_matches_rich_build,
+        test_matches_rich_dispatch_subcommands,
         test_matches_boolean,
         test_errors,
         TestCase::empty
