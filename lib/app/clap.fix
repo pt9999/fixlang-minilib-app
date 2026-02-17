@@ -672,18 +672,30 @@ namespace ArgMatches {
         map: HashMap::empty(0)
     };
 
+    // Gets the matched subcommand name and matchings for the subcommand.
+    //
+    // # Parameters
+    // - `matches` Matchings of arguments
     subcommand: ArgMatches -> Option (String, ArgMatches);
     subcommand = |matches| (
         matches.@subcommand
     );
 
     // Gets the array of argument values with the specified ID.
+    //
+    // # Parameters
+    // - `id`: An argument ID
+    // - `matches` Matchings of arguments
     get_many: String -> ArgMatches -> Option (Array String);
     get_many = |id, matches| (
         matches.@map.find(id)
     );
 
     // Gets the value of the argument with the specified ID.
+    //
+    // # Parameters
+    // - `id`: An argument ID
+    // - `matches` Matchings of arguments
     get_one: String -> ArgMatches -> Option String;
     get_one = |id, matches| (
         let array = *matches.get_many(id);
@@ -691,6 +703,11 @@ namespace ArgMatches {
         some(array.@(0))
     );
 
+    // Gets the boolean value of the argument with the specified ID.
+    //
+    // # Parameters
+    // - `id`: An argument ID
+    // - `matches` Matchings of arguments
     get_flag: String -> ArgMatches -> Bool;
     get_flag = |id, matches| (
         matches.get_one(name) == some("true")
