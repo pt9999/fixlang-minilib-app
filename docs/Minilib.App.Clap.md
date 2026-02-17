@@ -1,6 +1,6 @@
 # Minilib.App.Clap
 
-Defined in minilib-app@0.7.0
+Defined in minilib-app@0.7.1
 
 Command line argument parser.
 Inspired by [`clap` crate of Rust](https://docs.rs/clap/3.2.0/clap/index.html).
@@ -13,7 +13,7 @@ Inspired by [`clap` crate of Rust](https://docs.rs/clap/3.2.0/clap/index.html).
    - An argument definition (`Arg`) might have an ID, a short option, a long option,
      a help message, default value etc.
 2. Parse a command line using `command.get_matches`.
-3. Get the values of the arguments from `ArgMatches`.
+3. Get the values of the arguments from the argument matchings (`ArgMatches`).
 
 Example:
 ```
@@ -111,27 +111,65 @@ Sets `@value_name`.
 
 ### namespace Minilib.App.Clap::ArgMatches
 
+#### dispatch_subcommands
+
+Type: `[m : Minilib.Monad.Error::MonadError] Std::Array (Minilib.App.Clap::Command, Minilib.App.Clap::ArgMatches -> m a) -> Minilib.App.Clap::ArgMatches -> m a`
+
+Dispatches subcommands.
+
+##### Parameters
+
+- `subcommand_handlers`: An array of pairs of subcommands and their handlers
+- `matches`: Argument matchings of the main command
+
 #### empty
 
 Type: `Minilib.App.Clap::ArgMatches`
 
 An empty `ArgMatches` structure.
 
+#### get_flag
+
+Type: `Std::String -> Minilib.App.Clap::ArgMatches -> Std::Bool`
+
+Gets the boolean value of the argument specified by ID.
+
+##### Parameters
+
+- `id`: An argument ID
+- `matches`: Argument matchings
+
 #### get_many
 
 Type: `Std::String -> Minilib.App.Clap::ArgMatches -> Std::Option (Std::Array Std::String)`
 
-Gets the array of argument values with the specified ID.
+Gets the plural values of the argument specified by ID.
+
+##### Parameters
+
+- `id`: An argument ID
+- `matches`: Argument matchings
 
 #### get_one
 
 Type: `Std::String -> Minilib.App.Clap::ArgMatches -> Std::Option Std::String`
 
-Gets the value of the argument with the specified ID.
+Gets the single value of the argument specified by ID.
+
+##### Parameters
+
+- `id`: An argument ID
+- `matches`: Argument matchings
 
 #### subcommand
 
 Type: `Minilib.App.Clap::ArgMatches -> Std::Option (Std::String, Minilib.App.Clap::ArgMatches)`
+
+Gets the matched subcommand name and matchings for the subcommand.
+
+##### Parameters
+
+- `matches`: Argument matchings
 
 ### namespace Minilib.App.Clap::ArgParser
 
@@ -200,18 +238,18 @@ Sets the description about the command.
 ##### Parameters
 
 - `about`: The description about the command
-- `command`: A command
+- `command`: A command definition
 
 #### arg
 
 Type: `Minilib.App.Clap::Arg -> Minilib.App.Clap::Command -> Minilib.App.Clap::Command`
 
-Add an argument definition to the command.
+Adds an argument definition to the command.
 
 ##### Parameters
 
 - `arg`: An argument definition to the command
-- `command`: A command
+- `command`: A command definition
 
 #### author
 
@@ -222,7 +260,7 @@ Sets the author of the command.
 ##### Parameters
 
 - `author`: The author of the command
-- `command`: A command
+- `command`: A command definition
 
 #### bin_name
 
@@ -233,7 +271,7 @@ Sets the name of the executable binary of the command.
 ##### Parameters
 
 - `bin_name`: The name of the executable binary of the command
-- `command`: A command
+- `command`: A command definition
 
 #### display_name
 
@@ -244,7 +282,24 @@ Sets the display name of the command.
 ##### Parameters
 
 - `display_name`: The display name of the command
-- `command`: A command
+- `command`: A command definition
+
+#### empty
+
+Type: `Minilib.App.Clap::Command`
+
+A command definition with empty name.
+
+#### find_subcommand
+
+Type: `Std::String -> Minilib.App.Clap::Command -> Std::Option Minilib.App.Clap::Command`
+
+Finds a subcommand with the specified name.
+
+##### Parameters
+
+- `name`: A subcommand name
+- `command`: A command definition
 
 #### get_matches
 
@@ -255,7 +310,7 @@ If `--help` or `--version` is specified, the help string or version string will 
 
 ##### Parameters
 
-- `command`: A command
+- `command`: A command definition
 
 #### get_matches_from
 
@@ -267,7 +322,7 @@ If `--help` or `--version` is specified, the help string or version string will 
 ##### Parameters
 
 - `inputs`: An input array
-- `command`: A command
+- `command`: A command definition
 
 #### name
 
@@ -278,13 +333,13 @@ Sets the name of the command.
 ##### Parameters
 
 - `name`: The name of the command
-- `command`: A command
+- `command`: A command definition
 
 #### new
 
 Type: `Std::String -> Minilib.App.Clap::Command`
 
-Creates a command structure by specifying the command name.
+Creates a new command definition.
 
 ##### Parameters
 
@@ -294,12 +349,12 @@ Creates a command structure by specifying the command name.
 
 Type: `Minilib.App.Clap::Command -> Minilib.App.Clap::Command -> Minilib.App.Clap::Command`
 
-Add a subcommand to the command.
+Adds a subcommand definition to the command.
 
 ##### Parameters
 
 - `subcommand`: A subcommand
-- `command`: A command
+- `command`: A command definition
 
 #### version
 
@@ -310,7 +365,7 @@ Sets the version of the command.
 ##### Parameters
 
 - `version`: The version of the command
-- `command`: A command
+- `command`: A command definition
 
 ### namespace Minilib.App.Clap::HelpTemplate
 
@@ -330,7 +385,8 @@ Type: `Std::String -> Minilib.App.Clap::HelpTemplate`
 
 Defined as: `type Arg = unbox struct { ...fields... }`
 
-A structure that defines arguments.
+An argument definition.
+
 Arguments can be either optional or positional arguments.
 If either `short` or `long` is set, it becomes an optional argument.
 Otherwise, it is a positional argument.
@@ -399,21 +455,25 @@ The action taken when the argument is parsed.
 
 Defined as: `type ArgMatches = box struct { ...fields... }`
 
-A structure representing the result of parsing command line arguments.
+The argument matchings of the command line.
 
 ##### field `subcommand`
 
 Type: `Std::Option (Std::String, Minilib.App.Clap::ArgMatches)`
 
+Subcommand name and submatches
+
 ##### field `map`
 
 Type: `HashMap::HashMap Std::String (Std::Array Std::String)`
+
+A hashmap from the argument ID to the argument values
 
 #### Command
 
 Defined as: `type Command = box struct { ...fields... }`
 
-A structure representing a command (ie. application).
+A command definition.
 
 ##### field `name`
 
@@ -485,6 +545,8 @@ A version template of the command.
 
 Defined as: `type HelpTemplate = unbox struct { ...fields... }`
 
+A help template. (used internally)
+
 ##### field `data`
 
 Type: `Std::String`
@@ -545,7 +607,7 @@ Displays the version of the command.
 
 Defined as: `type ArgParser = unbox struct { ...fields... }`
 
-Argument parser. (used internally)
+Command line argument parser. (used internally)
 
 ##### field `command`
 
