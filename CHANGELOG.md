@@ -1,6 +1,7 @@
 ## 0.7.4
 ### Changed
 - Upgraded to minilib-common@0.13.2.
+- Modified some code to remove the deprecation warnings.
 
 ## 0.7.3
 ### Changed

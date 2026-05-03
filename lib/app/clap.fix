@@ -419,7 +419,7 @@ namespace Command {
     // - `command`: A command definition
     get_matches_from: Array String -> Command -> Result ErrMsg ArgMatches;
     get_matches_from = |inputs, command| (
-        if command.@subcommands.get_size > 0 {
+        if command.@subcommands.@size > 0 {
             let (name, submatches) = *command._get_submatches_from(inputs);
             let matches = ArgMatches::empty.set_subcommand(some $ (name, submatches));
             ok $ matches
@@ -435,7 +435,7 @@ namespace Command {
     _get_submatches_from = |inputs, command| (
         // drop first argument as it is the executable name
         let inputs = inputs.to_iter.get_tail.map_or([], to_array);
-        if inputs.get_size == 0 {
+        if inputs.@size == 0 {
             err $ command._render_help
         };
         let subcommand_name = inputs.@(0);
@@ -624,7 +624,7 @@ namespace ArgParser
     _increment_value = |arg, parser| (
         ok $ parser.mod_matches(|matches|
             matches._mod_values(arg.@id, |values|
-                if values.get_size != 1 { ["1"] };
+                if values.@size != 1 { ["1"] };
                 values.mod(0, |value|
                     let res: Result ErrMsg I64 = value.from_string;
                     if res.is_err { "1" };
@@ -727,7 +727,7 @@ namespace ArgMatches {
     get_one: String -> ArgMatches -> Option String;
     get_one = |id, matches| (
         let array = *matches.get_many(id);
-        if array.get_size == 0 { none() };
+        if array.@size == 0 { none() };
         some(array.@(0))
     );
 
@@ -815,13 +815,13 @@ namespace HelpTemplate {
             "    " + command.@bin_name + command.@subcommand_path
         );
         let usage = usage + (
-            if options.get_size == 0 { "" } else { " [OPTIONS]" }
+            if options.@size == 0 { "" } else { " [OPTIONS]" }
         );
         let usage = usage + (
             args.to_iter.map(|arg| " " + arg.to_string).concat_iter
         );
         let usage = usage + (
-            if subcommands.get_size == 0 { "" } else { " [SUBCOMMAND]" }
+            if subcommands.@size == 0 { "" } else { " [SUBCOMMAND]" }
         );
         usage + "\n"
     );
@@ -833,19 +833,19 @@ namespace HelpTemplate {
         let subcommands = command.@subcommands;
 
         let output: Array String = Array::empty(3);
-        let output = if args.get_size == 0 { output } else {
+        let output = if args.@size == 0 { output } else {
             output.push_back(
                 "ARGS:\n" +
                 args.to_iter.map(_format_arg).concat_iter
             )
         };
-        let output = if options.get_size == 0 { output } else {
+        let output = if options.@size == 0 { output } else {
             output.push_back(
                 "OPTIONS:\n" +
                 options.to_iter.map(_format_option).concat_iter
             )
         };
-        let output = if subcommands.get_size == 0 { output } else {
+        let output = if subcommands.@size == 0 { output } else {
             output.push_back(
                 "SUBCOMMANDS:\n" +
                 subcommands.to_iter.map(_format_subcommand).concat_iter
