@@ -1,3 +1,7 @@
+## 0.7.4
+### Changed
+- Upgraded to minilib-common@0.13.2.
+
 ## 0.7.3
 ### Changed
 - Upgraded to minilib-common@0.13.1, hashmap@2.0.0.
