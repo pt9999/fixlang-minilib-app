@@ -1,12 +1,30 @@
 module ClapTest;
 
-import HashMap;
-
-import Minilib.Common.Common;
-import Minilib.App.Clap;
-import Minilib.Text.StringEx;
-import Minilib.Testing.UnitTest;
-import Minilib.Trait.Traversable;
+import Minilib.App.Clap::{
+    Command, 
+    Arg::{
+        @action, @default_value, @help, @id, @long, @multiple_values, @required, @short, @takes_value, 
+        @value_name, default_value, help, long, new, required, set_action, short, takes_multiple_values, 
+        takes_value, value_name
+    }, 
+    ArgAction::ArgAction::{increment, is_set_true, set_false, set_true}, 
+    ArgMatches::{dispatch_subcommands, get_flag, get_many, get_one, subcommand}, 
+    Command::{
+        about, arg, author, bin_name, display_name, find_subcommand, get_matches_from, new, subcommand, 
+        version
+    }
+};
+import Minilib.Testing.UnitTest::{
+    assert_equal, assert_true, make_table_test, make_test, run_test_driver, run_tests, TestCase, 
+    TestCase::empty
+};
+import Minilib.Text.StringEx::Format::format;
+import Minilib.Trait.Traversable::foreach_m;
+import Std::{
+    IO, String, Array::to_iter, IO::{IOFail, IOFail::from_result}, Iterator::{filter, to_array}, 
+    Monad::pure, Option::{as_some, is_some, none, some}, Result::{as_err, is_err}, 
+    String::{is_empty, split}
+};
 
 empty_command: Command;
 empty_command = (

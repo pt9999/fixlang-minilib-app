@@ -1,8 +1,8 @@
 module Test;
 
-import Minilib.Testing.UnitTest;
-
-import ClapTest;
+import ClapTest::main;
+import Minilib.Testing.UnitTest::{TestSuite, TestSuite::run};
+import Std::IO;
 
 testsuite: TestSuite;
 testsuite = [
