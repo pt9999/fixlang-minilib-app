@@ -1,3 +1,7 @@
+## 0.9.0
+### Changed
+- fixproj.toml: Bumped `fix_version` to 1.6.0. Depends on minilib-common@0.15.0.
+
 ## 0.8.0
 ### Changed
 - Merged PR#2 (thanks to tttmmmyyyy san).
