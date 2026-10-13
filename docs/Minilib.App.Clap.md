@@ -1,6 +1,6 @@
 # Minilib.App.Clap
 
-Defined in minilib-app@0.8.0
+Defined in minilib-app@0.9.0
 
 Command line argument parser.
 Inspired by [`clap` crate of Rust](https://docs.rs/clap/3.2.0/clap/index.html).
